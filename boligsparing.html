@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hvor mye bolig har du råd til? – Kalkulator</title>
+<link rel="stylesheet" href="kalkulator.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Boligkjøp</span>
+    <h1>Hvor mye bolig har dere råd til?</h1>
+    <p>Se den høyeste rammen dere kan strekke dere mot, og hva som eventuelt begrenser dere.</p>
+    <a href="index.html" class="back-link">&larr; Tilbake til forsiden</a>
+  </header>
+
+  <div class="card">
+    <h2>Hvem skal kjøpe bolig?</h2>
+    <div class="segmented" id="personToggle">
+      <button type="button" class="active" data-val="1">Én person</button>
+      <button type="button" data-val="2">To personer</button>
+    </div>
+
+    <div class="field">
+      <label for="inntekt1">Årslønn, brutto <span class="val" id="inntekt1Val">600 000 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="inntekt1" value="600 000" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <input type="range" id="inntekt1Range" min="0" max="2000000" step="10000" value="600000">
+    </div>
+
+    <div class="field" id="boks-inntekt2" style="display:none;">
+      <label for="inntekt2">Årslønn person 2, brutto <span class="val" id="inntekt2Val">0 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="inntekt2" value="0" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <input type="range" id="inntekt2Range" min="0" max="2000000" step="10000" value="0">
+    </div>
+
+    <div class="field">
+      <label for="barn">Antall barn under 18 år <span class="val" id="barnVal">0</span></label>
+      <div class="input-row">
+        <input type="number" id="barn" value="0" min="0" max="10" step="1" inputmode="numeric">
+        <span class="unit">barn</span>
+      </div>
+      <div class="hint">Barnetrygd regnes normalt med som inntekt i bankens beregning, og løfter derfor låneevnen noe.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Gjeld og egenkapital</h2>
+
+    <div class="field">
+      <label for="gjeld">Annen gjeld <span class="val" id="gjeldVal">0 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="gjeld" value="0" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <div class="hint">Studielån, billån og forbrukslån til sammen.</div>
+    </div>
+
+    <div class="field">
+      <label for="ek">Egenkapital <span class="val" id="ekVal">450 000 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="ek" value="450 000" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <input type="range" id="ekRange" min="0" max="2000000" step="10000" value="450000">
+      <div class="hint">BSU, sparekonto og eventuelt forskudd på arv. Banken krever normalt at egenkapitalen dekker minst 15 % av kjøpesummen.</div>
+    </div>
+  </div>
+
+  <div class="results">
+    <h2>Din låneramme</h2>
+    <div class="breakdown">
+      <div class="row">
+        <div class="label"><span class="dot income"></span>Basert på inntekt
+          <small>5 × inntekt + barnetrygd, minus annen gjeld</small>
+        </div>
+        <div class="amount" id="outInntekt">0 kr</div>
+      </div>
+      <div class="row">
+        <div class="label"><span class="dot equity"></span>Basert på egenkapital
+          <small>Egenkapitalen må dekke minst 15 % av prisen</small>
+        </div>
+        <div class="amount" id="outEk">0 kr</div>
+      </div>
+    </div>
+
+    <div class="total-box">
+      <div class="t-label">Dere kan se på boliger opptil</div>
+      <div class="t-amount" id="outTotal">0 <span>kr</span></div>
+      <div class="t-sub" id="outForklaring">Fyll inn tallene dine over</div>
+    </div>
+  </div>
+
+  <a href="AFFILIATE_LENKE_HER" class="cta" id="ctaBtn" target="_blank" rel="noopener">
+    Sammenlign boliglån og få tilbud her
+  </a>
+  <div class="cta-sub">Tar under ett minutt · Ingen forpliktelser</div>
+
+  <footer>
+    Forenklet beregning basert på boliglånsforskriftens hovedregler (maks 5 × inntekt i totalgjeld,<br>
+    barnetrygd på ca. 1 750 kr/mnd per barn, og minst 15 % egenkapital). Banken gjør i tillegg en<br>
+    individuell vurdering og stresstest av renten, så det endelige tilbudet kan avvike noe.
+  </footer>
+</div>
+
+<script src="kalkulator.js"></script>
+<script>
+(function(){
+  const K = window.KalkUtils;
+  const BARNETRYGD_MND = 1750; // grov, flat sats per barn – bruk kun som pekepinn
+
+  const krIds = ['inntekt1','inntekt2','gjeld','ek'];
+  const otherIds = ['barn'];
+  const ids = krIds.concat(otherIds);
+  const el = {};
+  ids.forEach(id => { el[id] = document.getElementById(id); });
+  const ranges = ['inntekt1','inntekt2','ek'];
+  const rangeEl = {};
+  ranges.forEach(id => { rangeEl[id] = document.getElementById(id + 'Range'); });
+
+  krIds.forEach(id => K.bindThousands(el[id]));
+
+  function getVal(id){
+    return krIds.includes(id) ? K.parseNum(el[id].value) : (parseFloat(el[id].value) || 0);
+  }
+
+  let antallPersoner = 1;
+  const toggleBtns = document.querySelectorAll('#personToggle button');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      antallPersoner = parseInt(btn.dataset.val, 10);
+      const boks2 = document.getElementById('boks-inntekt2');
+      boks2.style.display = antallPersoner === 2 ? 'block' : 'none';
+      if (antallPersoner === 1) {
+        el.inntekt2.value = '0';
+        rangeEl.inntekt2.value = 0;
+        updateLabel('inntekt2');
+      }
+      calculate();
+    });
+  });
+
+  const valLabels = {
+    inntekt1: v => K.formatNum(v) + ' kr',
+    inntekt2: v => K.formatNum(v) + ' kr',
+    gjeld: v => K.formatNum(v) + ' kr',
+    ek: v => K.formatNum(v) + ' kr',
+    barn: v => v + (v === 1 ? ' barn' : ' barn')
+  };
+
+  function updateLabel(id){
+    const labelEl = document.getElementById(id + 'Val');
+    if(labelEl) labelEl.textContent = id === 'barn' ? getVal(id) : valLabels[id](getVal(id));
+  }
+  function syncFromInput(id){
+    if(rangeEl[id]) rangeEl[id].value = getVal(id);
+    updateLabel(id);
+    calculate();
+  }
+  function syncFromRange(id){
+    el[id].value = K.formatNum(rangeEl[id].value);
+    updateLabel(id);
+    calculate();
+  }
+  ids.forEach(id => el[id].addEventListener('input', () => syncFromInput(id)));
+  ranges.forEach(id => rangeEl[id].addEventListener('input', () => syncFromRange(id)));
+
+  function calculate(){
+    const inntekt1 = Math.max(0, getVal('inntekt1'));
+    const inntekt2 = antallPersoner === 2 ? Math.max(0, getVal('inntekt2')) : 0;
+    const gjeld = Math.max(0, getVal('gjeld'));
+    const ek = Math.max(0, getVal('ek'));
+    const barn = Math.max(0, Math.round(getVal('barn')));
+
+    const barnetrygdAarlig = barn * BARNETRYGD_MND * 12;
+    const samletInntekt = inntekt1 + inntekt2 + barnetrygdAarlig;
+
+    // Regel 1: total gjeld (eksisterende + nytt boliglån) maks 5 x brutto årsinntekt (inkl. barnetrygd)
+    const maxLaan = Math.max(0, samletInntekt * 5 - gjeld);
+    const maxKjopesumInntekt = maxLaan + ek;
+
+    // Regel 2: egenkapitalen må minst dekke 15 % av kjøpesummen (maks 85 % belåning)
+    const maxKjopesumEk = ek > 0 ? ek / 0.15 : 0;
+
+    document.getElementById('outInntekt').textContent = K.formatNum(maxKjopesumInntekt) + ' kr';
+    document.getElementById('outEk').textContent = K.formatNum(maxKjopesumEk) + ' kr';
+
+    const totalEl = document.getElementById('outTotal');
+    const forklaringEl = document.getElementById('outForklaring');
+
+    if (ek <= 0 && maxKjopesumInntekt <= 0) {
+      totalEl.innerHTML = '0 <span>kr</span>';
+      forklaringEl.textContent = 'Legg inn inntekt og egenkapital for å se rammen din.';
+      return;
+    }
+
+    // Viser den høyeste, mest optimistiske rammen ("opptil"), med tydelig forklaring
+    // på hva som faktisk skal til for å nå den – slik at tallet ikke er misvisende.
+    const maxBolig = Math.max(maxKjopesumInntekt, maxKjopesumEk);
+    totalEl.innerHTML = K.formatNum(maxBolig) + ' <span>kr</span>';
+
+    if (maxKjopesumInntekt >= maxKjopesumEk) {
+      forklaringEl.textContent = 'Inntekten strekker til dette, men med dagens egenkapital holder banken normalt kjøp opp til ' + K.formatNum(maxKjopesumEk) + ' kr – du trenger mer egenkapital (eller tilleggssikkerhet) for å nå toppen.';
+    } else {
+      forklaringEl.textContent = 'Egenkapitalen din strekker til dette, men inntekten holder normalt kjøp opp til ' + K.formatNum(maxKjopesumInntekt) + ' kr – resten av lånet må dekkes på annet vis.';
+    }
+  }
+
+  ids.forEach(updateLabel);
+  calculate();
+})();
+</script>
+</body>
+</html>

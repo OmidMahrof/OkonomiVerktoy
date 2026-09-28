@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hvor dyr bil har jeg råd til? – Kalkulator</title>
+<link rel="stylesheet" href="kalkulator.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Låneevne</span>
+    <h1>Hvor dyr bil har du råd til?</h1>
+    <p>Ta utgangspunkt i det du faktisk har igjen hver måned, ikke bare det banken tilbyr.</p>
+    <a href="index.html" class="back-link">&larr; Tilbake til forsiden</a>
+  </header>
+
+  <div class="card">
+    <h2>Din økonomi</h2>
+
+    <div class="field">
+      <label for="inntekt">Utbetalt per måned (etter skatt) <span class="val" id="inntektVal">35 000 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="inntekt" value="35 000" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <input type="range" id="inntektRange" min="0" max="100000" step="500" value="35000">
+    </div>
+
+    <div class="field">
+      <label for="utgifter">Faste månedlige utgifter <span class="val" id="utgifterVal">25 000 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="utgifter" value="25 000" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <input type="range" id="utgifterRange" min="0" max="80000" step="500" value="25000">
+      <div class="hint">Bolig, mat, strøm, forsikringer og annet du uansett betaler hver måned.</div>
+    </div>
+
+    <div class="field">
+      <label for="egenkapital">Egenkapital / innbyttebil <span class="val" id="egenkapitalVal">0 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="egenkapital" value="0" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Lånevilkår</h2>
+
+    <div class="field">
+      <label for="rente">Forventet effektiv rente <span class="val" id="renteVal">7,5 %</span></label>
+      <div class="input-row">
+        <input type="number" id="rente" value="7.5" min="0" max="25" step="0.1" inputmode="decimal">
+        <span class="unit">%</span>
+      </div>
+      <input type="range" id="renteRange" min="0" max="20" step="0.1" value="7.5">
+    </div>
+
+    <div class="field">
+      <label for="aar">Nedbetalingstid <span class="val" id="aarVal">5 år</span></label>
+      <div class="input-row">
+        <input type="number" id="aar" value="5" min="1" max="15" step="1" inputmode="numeric">
+        <span class="unit">år</span>
+      </div>
+      <input type="range" id="aarRange" min="1" max="15" step="1" value="5">
+    </div>
+  </div>
+
+  <div class="results">
+    <h2>Din låneevne</h2>
+    <div class="breakdown">
+      <div class="row">
+        <div class="label"><span class="dot loan"></span>Ledig til billån
+          <small>Inntekt minus faste utgifter og buffer</small>
+        </div>
+        <div class="amount" id="outLedig">0 kr/mnd</div>
+      </div>
+      <div class="row">
+        <div class="label"><span class="dot drift"></span>Maks lånebeløp
+          <small>Det banken kan gi deg med disse vilkårene</small>
+        </div>
+        <div class="amount" id="outLan">0 kr</div>
+      </div>
+    </div>
+
+    <div class="total-box">
+      <div class="t-label">Du har råd til bil for inntil</div>
+      <div class="t-amount" id="outTotal">0 <span>kr</span></div>
+      <div class="t-sub" id="outSub">Basert på et månedlig avdrag på 0 kr</div>
+    </div>
+  </div>
+
+  <a href="AFFILIATE_LENKE_HER" class="cta" id="ctaBtn" target="_blank" rel="noopener">
+    Sjekk om du kan få billigere billån her
+  </a>
+  <div class="cta-sub">Tar under ett minutt · Ingen forpliktelser</div>
+
+  <footer>
+    Beregningen inkluderer en sikkerhetsmargin på 2 000 kr i måneden.<br>
+    Faktisk låneevne avhenger av bankens egne kriterier og kredittvurdering.
+  </footer>
+</div>
+
+<script src="kalkulator.js"></script>
+<script>
+(function(){
+  const K = window.KalkUtils;
+  const nf1 = new Intl.NumberFormat('nb-NO', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const BUFFER = 2000;
+
+  const krIds = ['inntekt','utgifter','egenkapital'];
+  const otherIds = ['rente','aar'];
+  const ids = krIds.concat(otherIds);
+  const el = {};
+  ids.forEach(id => { el[id] = document.getElementById(id); });
+  const ranges = ['inntekt','utgifter','rente','aar'];
+  const rangeEl = {};
+  ranges.forEach(id => { rangeEl[id] = document.getElementById(id + 'Range'); });
+
+  krIds.forEach(id => K.bindThousands(el[id]));
+
+  function getVal(id){
+    return krIds.includes(id) ? K.parseNum(el[id].value) : (parseFloat(el[id].value) || 0);
+  }
+
+  const valLabels = {
+    inntekt: v => K.formatNum(v) + ' kr',
+    utgifter: v => K.formatNum(v) + ' kr',
+    egenkapital: v => K.formatNum(v) + ' kr',
+    rente: v => nf1.format(v).replace('.', ',') + ' %',
+    aar: v => v + ' år'
+  };
+
+  function updateLabel(id){
+    const labelEl = document.getElementById(id + 'Val');
+    if(labelEl) labelEl.textContent = valLabels[id](getVal(id));
+  }
+  function syncFromInput(id){
+    if(rangeEl[id]) rangeEl[id].value = getVal(id);
+    updateLabel(id);
+    calculate();
+  }
+  function syncFromRange(id){
+    if (krIds.includes(id)) {
+      el[id].value = K.formatNum(rangeEl[id].value);
+    } else {
+      el[id].value = rangeEl[id].value;
+    }
+    updateLabel(id);
+    calculate();
+  }
+  ids.forEach(id => el[id].addEventListener('input', () => syncFromInput(id)));
+  ranges.forEach(id => rangeEl[id].addEventListener('input', () => syncFromRange(id)));
+
+  function calculate(){
+    const inntekt = Math.max(0, getVal('inntekt'));
+    const utgifter = Math.max(0, getVal('utgifter'));
+    const egenkapital = Math.max(0, getVal('egenkapital'));
+    const rentePct = Math.max(0, getVal('rente'));
+    const aar = Math.max(1, getVal('aar') || 1);
+
+    const maxMnd = Math.max(0, inntekt - utgifter - BUFFER);
+    const i = (rentePct / 100) / 12;
+    const n = aar * 12;
+
+    let maxLan;
+    if (maxMnd <= 0) {
+      maxLan = 0;
+    } else if (i === 0) {
+      maxLan = maxMnd * n;
+    } else {
+      maxLan = maxMnd * (1 - Math.pow(1 + i, -n)) / i;
+    }
+
+    const totalBilpris = maxLan + egenkapital;
+
+    document.getElementById('outLedig').textContent = K.formatNum(maxMnd) + ' kr/mnd';
+    document.getElementById('outLan').textContent = K.formatNum(maxLan) + ' kr';
+    document.getElementById('outTotal').innerHTML = K.formatNum(totalBilpris) + ' <span>kr</span>';
+    document.getElementById('outSub').textContent = 'Basert på et månedlig avdrag på ' + K.formatNum(maxMnd) + ' kr';
+  }
+
+  ids.forEach(updateLabel);
+  calculate();
+})();
+</script>
+</body>
+</html>

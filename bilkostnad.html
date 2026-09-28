@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reell eierkostnad for bil – Kalkulator</title>
+<link rel="stylesheet" href="kalkulator.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Bilkalkulator</span>
+    <h1>Hva koster bilen deg egentlig?</h1>
+    <p>Lånekostnad er bare halve historien. Legg til drift og verditap for å se den reelle månedskostnaden.</p>
+    <a href="index.html" class="back-link">&larr; Tilbake til forsiden</a>
+  </header>
+
+  <div class="card">
+    <h2>Lån og finansiering</h2>
+
+    <div class="field">
+      <label for="pris">Kjøpesum for bilen <span class="val" id="prisVal">400 000 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="pris" value="400 000" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <input type="range" id="prisRange" min="50000" max="1500000" step="5000" value="400000">
+    </div>
+
+    <div class="field">
+      <label for="egenkapital">Egenkapital <span class="val" id="egenkapitalVal">50 000 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="egenkapital" value="50 000" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+      <input type="range" id="egenkapitalRange" min="0" max="1500000" step="5000" value="50000">
+    </div>
+
+    <div class="field">
+      <label for="nedbetaling">Nedbetalingstid <span class="val" id="nedbetalingVal">7 år</span></label>
+      <div class="input-row">
+        <input type="number" id="nedbetaling" value="7" min="1" max="15" step="1" inputmode="numeric">
+        <span class="unit">år</span>
+      </div>
+      <input type="range" id="nedbetalingRange" min="1" max="15" step="1" value="7">
+    </div>
+
+    <div class="field">
+      <label for="rente">Effektiv rente <span class="val" id="renteVal">6,5 %</span></label>
+      <div class="input-row">
+        <input type="number" id="rente" value="6.5" min="0" max="25" step="0.1" inputmode="decimal">
+        <span class="unit">%</span>
+      </div>
+      <input type="range" id="renteRange" min="0" max="20" step="0.1" value="6.5">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Faste driftskostnader per måned</h2>
+
+    <div class="field">
+      <label for="forsikring">Forsikring <span class="val" id="forsikringVal">1 200 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="forsikring" value="1 200" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="drivstoff">Drivstoff / lading <span class="val" id="drivstoffVal">1 800 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="drivstoff" value="1 800" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="bompenger">Bompenger / parkering <span class="val" id="bompengerVal">700 kr</span></label>
+      <div class="input-row">
+        <input type="text" id="bompenger" value="700" inputmode="numeric" autocomplete="off">
+        <span class="unit">kr</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Verdifall</h2>
+    <div class="field">
+      <label for="verditap">Forventet årlig verditap <span class="val" id="verditapVal">10 %</span></label>
+      <div class="input-row">
+        <input type="number" id="verditap" value="10" min="0" max="30" step="0.5" inputmode="decimal">
+        <span class="unit">%</span>
+      </div>
+      <input type="range" id="verditapRange" min="0" max="25" step="0.5" value="10">
+    </div>
+  </div>
+
+  <div class="results">
+    <h2>Din reelle månedskostnad</h2>
+    <div class="breakdown">
+      <div class="row">
+        <div class="label"><span class="dot loan"></span>Rent lån
+          <small>Avdrag og renter på billånet</small>
+        </div>
+        <div class="amount" id="outLaan">0 kr</div>
+      </div>
+      <div class="row">
+        <div class="label"><span class="dot drift"></span>Driftskostnader
+          <small>Forsikring, drivstoff og bom</small>
+        </div>
+        <div class="amount" id="outDrift">0 kr</div>
+      </div>
+      <div class="row loss">
+        <div class="label"><span class="dot loss"></span>Verditap
+          <small>Den usynlige kostnaden</small>
+        </div>
+        <div class="amount" id="outVerditap">0 kr</div>
+      </div>
+    </div>
+
+    <div class="total-box">
+      <div class="t-label">Totalt reell kostnad per måned</div>
+      <div class="t-amount" id="outTotal">0 <span>kr/mnd</span></div>
+      <div class="t-sub" id="outLaanebelop">Lånebeløp: 0 kr</div>
+    </div>
+  </div>
+
+  <a href="AFFILIATE_LENKE_HER" class="cta" id="ctaBtn" target="_blank" rel="noopener">
+    Sjekk om du kan få billigere billån her
+  </a>
+  <div class="cta-sub">Tar under ett minutt · Ingen forpliktelser</div>
+
+  <footer>
+    Beregningene er veiledende og basert på tallene du oppgir.<br>
+    Faktiske lånevilkår avhenger av bank og kredittvurdering.
+  </footer>
+</div>
+
+<script src="kalkulator.js"></script>
+<script>
+(function(){
+  const K = window.KalkUtils;
+  const nf1 = new Intl.NumberFormat('nb-NO', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+  const krIds = ['pris','egenkapital','forsikring','drivstoff','bompenger'];
+  const otherIds = ['nedbetaling','rente','verditap'];
+  const ids = krIds.concat(otherIds);
+  const el = {};
+  ids.forEach(id => { el[id] = document.getElementById(id); });
+  const ranges = ['pris','egenkapital','nedbetaling','rente','verditap'];
+  const rangeEl = {};
+  ranges.forEach(id => { rangeEl[id] = document.getElementById(id + 'Range'); });
+
+  krIds.forEach(id => K.bindThousands(el[id]));
+
+  function getVal(id){
+    return krIds.includes(id) ? K.parseNum(el[id].value) : (parseFloat(el[id].value) || 0);
+  }
+
+  const valLabels = {
+    pris: v => K.formatNum(v) + ' kr',
+    egenkapital: v => K.formatNum(v) + ' kr',
+    nedbetaling: v => v + ' år',
+    rente: v => nf1.format(v).replace('.', ',') + ' %',
+    forsikring: v => K.formatNum(v) + ' kr',
+    drivstoff: v => K.formatNum(v) + ' kr',
+    bompenger: v => K.formatNum(v) + ' kr',
+    verditap: v => nf1.format(v).replace('.', ',') + ' %'
+  };
+
+  function updateLabel(id){
+    const labelEl = document.getElementById(id + 'Val');
+    if(labelEl) labelEl.textContent = valLabels[id](getVal(id));
+  }
+
+  function syncFromInput(id){
+    if(rangeEl[id]) rangeEl[id].value = getVal(id);
+    updateLabel(id);
+    calculate();
+  }
+  function syncFromRange(id){
+    if (krIds.includes(id)) {
+      el[id].value = K.formatNum(rangeEl[id].value);
+    } else {
+      el[id].value = rangeEl[id].value;
+    }
+    updateLabel(id);
+    calculate();
+  }
+
+  ids.forEach(id => {
+    el[id].addEventListener('input', () => syncFromInput(id));
+  });
+  ranges.forEach(id => {
+    rangeEl[id].addEventListener('input', () => syncFromRange(id));
+  });
+
+  function calculate(){
+    const pris = Math.max(0, getVal('pris'));
+    const egenkapital = Math.max(0, getVal('egenkapital'));
+    const arYr = Math.max(1, getVal('nedbetaling') || 1);
+    const rentePct = Math.max(0, getVal('rente'));
+    const forsikring = Math.max(0, getVal('forsikring'));
+    const drivstoff = Math.max(0, getVal('drivstoff'));
+    const bompenger = Math.max(0, getVal('bompenger'));
+    const verditapPct = Math.max(0, getVal('verditap'));
+
+    const laanebelop = Math.max(0, pris - egenkapital);
+    const n = arYr * 12;
+    const i = (rentePct / 100) / 12;
+
+    let terminbelop;
+    if (laanebelop <= 0) {
+      terminbelop = 0;
+    } else if (i === 0) {
+      terminbelop = laanebelop / n;
+    } else {
+      terminbelop = laanebelop * i / (1 - Math.pow(1 + i, -n));
+    }
+
+    const drift = forsikring + drivstoff + bompenger;
+    const verditapMnd = (pris * (verditapPct / 100)) / 12;
+    const total = terminbelop + drift + verditapMnd;
+
+    document.getElementById('outLaan').textContent = K.formatNum(terminbelop) + ' kr';
+    document.getElementById('outDrift').textContent = K.formatNum(drift) + ' kr';
+    document.getElementById('outVerditap').textContent = K.formatNum(verditapMnd) + ' kr';
+    document.getElementById('outTotal').innerHTML = K.formatNum(total) + ' <span>kr/mnd</span>';
+    document.getElementById('outLaanebelop').textContent = 'Lånebeløp: ' + K.formatNum(laanebelop) + ' kr';
+  }
+
+  ids.forEach(updateLabel);
+  calculate();
+})();
+</script>
+</body>
+</html>
